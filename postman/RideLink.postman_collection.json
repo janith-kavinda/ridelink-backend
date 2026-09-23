@@ -1,0 +1,166 @@
+{
+  "info": {
+    "name": "RideLink",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "accountUrl", "value": "http://localhost:4001" },
+    { "key": "driverUrl", "value": "http://localhost:4002" },
+    { "key": "rideUrl", "value": "http://localhost:4003" },
+    { "key": "paymentUrl", "value": "http://localhost:4004" },
+    { "key": "passengerToken", "value": "" },
+    { "key": "driverToken", "value": "" },
+    { "key": "driverId", "value": "" },
+    { "key": "rideId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Register Passenger",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Nimal\",\n  \"email\": \"nimal@test.com\",\n  \"password\": \"pass123\",\n  \"role\": \"PASSENGER\"\n}" },
+        "url": "{{accountUrl}}/auth/register"
+      }
+    },
+    {
+      "name": "2. Login Passenger",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"nimal@test.com\",\n  \"password\": \"pass123\"\n}" },
+        "url": "{{accountUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "3. Register Driver",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Kamal\",\n  \"email\": \"kamal@test.com\",\n  \"password\": \"pass123\",\n  \"role\": \"DRIVER\"\n}" },
+        "url": "{{accountUrl}}/auth/register"
+      }
+    },
+    {
+      "name": "4. Login Driver",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"kamal@test.com\",\n  \"password\": \"pass123\"\n}" },
+        "url": "{{accountUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "5. Driver: Create Profile",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{driverToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"vehiclePlate\": \"WP-CAB-1234\",\n  \"vehicleModel\": \"Toyota Prius\",\n  \"serviceArea\": \"Colombo\"\n}" },
+        "url": "{{driverUrl}}/drivers"
+      }
+    },
+    {
+      "name": "6. Driver: Go Online",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{driverToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"availability\": \"ONLINE\"\n}" },
+        "url": "{{driverUrl}}/drivers/{{driverId}}/availability"
+      }
+    },
+    {
+      "name": "7. Passenger: Create Ride",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{passengerToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"pickup\": { \"lat\": 6.9, \"lng\": 79.8, \"label\": \"Fort\" },\n  \"destination\": { \"lat\": 6.93, \"lng\": 79.85, \"label\": \"Rajagiriya\" },\n  \"serviceArea\": \"Colombo\"\n}" },
+        "url": "{{rideUrl}}/rides"
+      }
+    },
+    {
+      "name": "8. Assign Driver (interservice call)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{passengerToken}}" }],
+        "url": "{{rideUrl}}/rides/{{rideId}}/assign"
+      }
+    },
+    {
+      "name": "9. Update Status -> ACCEPTED",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{passengerToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"status\": \"ACCEPTED\" }" },
+        "url": "{{rideUrl}}/rides/{{rideId}}/status"
+      }
+    },
+    {
+      "name": "10. Update Status -> IN_PROGRESS",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{passengerToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"status\": \"IN_PROGRESS\" }" },
+        "url": "{{rideUrl}}/rides/{{rideId}}/status"
+      }
+    },
+    {
+      "name": "11. Update Status -> COMPLETED (triggers payment)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{passengerToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"status\": \"COMPLETED\" }" },
+        "url": "{{rideUrl}}/rides/{{rideId}}/status"
+      }
+    },
+    {
+      "name": "12. NEGATIVE: Invalid transition",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{passengerToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"status\": \"ACCEPTED\" }" },
+        "url": "{{rideUrl}}/rides/{{rideId}}/status"
+      }
+    },
+    {
+      "name": "13. Fare Estimate",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{passengerToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"distanceKm\": 10 }" },
+        "url": "{{paymentUrl}}/fares/estimate"
+      }
+    },
+    {
+      "name": "14. NEGATIVE: Assign with no driver online",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{passengerToken}}" }],
+        "url": "{{rideUrl}}/rides/{{rideId}}/assign"
+      }
+    }
+  ]
+}
