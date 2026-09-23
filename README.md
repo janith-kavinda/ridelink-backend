@@ -14,10 +14,10 @@ use Java + Spring Boot** (no Node.js/Express/MERN). MongoDB is used per-service.
 
 | # | Service | Port | Owner | Responsibility |
 |---|---------|------|-------|-----------------|
-| 1 | account-service | 4001 | Member 1 | Register/login, JWT issuance, roles, profile |
-| 2 | driver-service | 4002 | Member 2 | Driver profile, vehicle, availability, location |
-| 3 | ride-service | 4003 | Member 3 | Ride requests, driver assignment, status lifecycle |
-| 4 | payment-service | 4004 | Member 4 | Fare estimate/final fare, simulated payment, receipts |
+| 1 | account-service | 4001 | IT24100222| Register/login, JWT issuance, roles, profile |
+| 2 | driver-service | 4002 | IT23712386 | Driver profile, vehicle, availability, location |
+| 3 | ride-service | 4003 |IT24100160| Ride requests, driver assignment, status lifecycle |
+| 4 | payment-service | 4004 | IT24100253 | Fare estimate/final fare, simulated payment, receipts |
 
 Fill in the actual member names before submission.
 
