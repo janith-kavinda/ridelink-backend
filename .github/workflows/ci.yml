@@ -1,0 +1,67 @@
+name: RideLink CI
+
+# Runs on pushes and pull requests to main and any feature branch,
+# satisfying "CI pipeline that automatically builds and runs tests
+# for all four services on the agreed repository events".
+on:
+  push:
+    branches: ["main", "feature/**"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build-and-test:
+    name: Build & test (${{ matrix.service }})
+    runs-on: ubuntu-latest
+
+    # Each of the 4 services is built and tested independently -
+    # a failure in one service's job does not block the others,
+    # matching their independent deployability.
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - account-service
+          - driver-service
+          - ride-service
+          - payment-service
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Build and run unit tests
+        # Unit tests use Mockito-mocked repositories/HTTP clients (see each
+        # service's src/test), so no live MongoDB or other services are
+        # required for CI - this keeps the pipeline fast and self-contained.
+        working-directory: ${{ matrix.service }}
+        run: mvn -B clean verify
+
+      - name: Upload surefire test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.service }}-test-results
+          path: ${{ matrix.service }}/target/surefire-reports/
+          retention-days: 14
+
+  all-services-build:
+    name: All services build summary
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check matrix result
+        run: |
+          if [ "${{ needs.build-and-test.result }}" != "success" ]; then
+            echo "One or more services failed to build or test."
+            exit 1
+          fi
+          echo "All four services built and tested successfully."
