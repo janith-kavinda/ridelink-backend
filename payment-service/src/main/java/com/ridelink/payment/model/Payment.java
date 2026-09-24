@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "payments")
 public class Payment {
 
+    // Represents a completed or failed payment record for a ride transaction.
     @Id
     private String id; // MongoDB document id
 
