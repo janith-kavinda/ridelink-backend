@@ -1,27 +1,27 @@
 package com.ridelink.payment.model;
 
+import java.time.Instant;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.Instant;
 
 @Document(collection = "payments")
 public class Payment {
 
     @Id
-    private String id;
+    private String id; // MongoDB document id
 
     private String rideId; // references ride-service Ride.id (no direct DB join)
-    private String passengerId;
+    private String passengerId; // passenger who paid for the ride
 
-    private double distanceKm;
-    private double fare;
-    private String currency = "Rs";
+    private double distanceKm; // distance used to calculate fare
+    private double fare; // final computed fare for this ride
+    private String currency = "Rs"; // currency used for this payment
 
     private String status; // PAID, FAILED
-    private String receiptNumber;
+    private String receiptNumber; // unique external receipt identifier
 
-    private Instant createdAt = Instant.now();
+    private Instant createdAt = Instant.now(); // payment creation timestamp
 
     public Payment() {
     }
