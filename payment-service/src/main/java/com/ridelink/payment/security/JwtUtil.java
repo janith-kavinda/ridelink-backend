@@ -1,18 +1,21 @@
 package com.ridelink.payment.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+
+import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
 
+    // Shared secret and token expiry used to validate JWTs issued by the account service.
     private final SecretKey key;
     private final long expirationMs;
 
@@ -25,6 +28,7 @@ public class JwtUtil {
         this.expirationMs = expirationMs;
     }
 
+    // Generates a signed JWT containing the user id, role, and email.
     public String generateToken(String userId, String role, String email) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
@@ -38,6 +42,7 @@ public class JwtUtil {
                 .compact();
     }
 
+    // Parses and validates a JWT, returning the signed claims payload.
     public Claims parseClaims(String token) {
         return Jwts.parser()
                 .verifyWith(key)

@@ -1,13 +1,14 @@
 package com.ridelink.payment.security;
 
+import java.io.IOException;
+
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
 
 /**
  * Verifies the JWT issued by account-service (all services trust it because they
@@ -22,6 +23,7 @@ import java.io.IOException;
  */
 public class JwtAuthFilter extends OncePerRequestFilter {
 
+    // Request attributes used by AuthHelper and controllers.
     public static final String AUTH_USER_ATTR = "authUser";
     public static final String RAW_TOKEN_ATTR = "authToken";
 
@@ -35,7 +37,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                      FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
-        // Allow health checks and Swagger without a token
+        // Allow public endpoints such as health checks and Swagger docs without authentication.
         if (path.startsWith("/health") || path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs")) {
             filterChain.doFilter(request, response);
             return;
@@ -45,6 +47,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
             try {
+                // Validate the JWT and extract user details for downstream authorization checks.
                 var claims = jwtUtil.parseClaims(token);
                 AuthenticatedUser user = new AuthenticatedUser(
                         claims.getSubject(),
@@ -54,7 +57,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 request.setAttribute(AUTH_USER_ATTR, user);
                 request.setAttribute(RAW_TOKEN_ATTR, token);
             } catch (JwtException ignored) {
-                // leave authUser unset - downstream will reject with 401 if auth is required
+                // Leave authUser unset so downstream controllers can reject invalid requests with 401/403.
             }
         }
         filterChain.doFilter(request, response);

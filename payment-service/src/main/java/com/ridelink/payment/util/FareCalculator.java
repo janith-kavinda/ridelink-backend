@@ -11,7 +11,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class FareCalculator {
 
+    // Fixed base charge applied to every ride.
     private final double base;
+
+    // Additional charge per kilometer traveled.
     private final double perKmRate;
 
     public FareCalculator(@Value("${fare.base}") double base,
@@ -20,6 +23,7 @@ public class FareCalculator {
         this.perKmRate = perKmRate;
     }
 
+    // Calculates the estimated or final fare for a trip using the configured pricing model.
     public double calculate(double distanceKm) {
         double fare = base + distanceKm * perKmRate;
         return Math.round(fare * 100.0) / 100.0;

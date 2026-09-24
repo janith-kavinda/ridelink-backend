@@ -1,9 +1,10 @@
 package com.ridelink.payment.security;
 
+// Holds the authenticated principal extracted from the JWT for this service.
 public class AuthenticatedUser {
-    private final String id;
-    private final String role;
-    private final String email;
+    private final String id; // user/account id from the token
+    private final String role; // user role such as CUSTOMER or DRIVER
+    private final String email; // email associated with the authenticated user
 
     public AuthenticatedUser(String id, String role, String email) {
         this.id = id;
