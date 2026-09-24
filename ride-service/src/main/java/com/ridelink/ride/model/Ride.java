@@ -60,7 +60,9 @@ public class Ride {
         public Instant getAt() { return at; }
         public void setAt(Instant at) { this.at = at; }
     }
-
+/**
+     * Appends a new status change event with current timestamp to history.
+     */
     public void addHistory(String status) {
         this.history.add(new StatusEvent(status, Instant.now()));
     }
