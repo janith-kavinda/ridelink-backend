@@ -43,24 +43,26 @@ public class PaymentController {
         this.fareCalculator = fareCalculator;
     }
 
+    // Calculates a fare estimate without creating a payment record.
     @Operation(summary = "Estimate a fare for a given distance")
     @PostMapping("/fares/estimate")
-    public Map estimateFare(@Valid @RequestBody FareEstimateRequest req,
-                                           HttpServletRequest request) {
+    public Map<String, Object> estimateFare(@Valid @RequestBody FareEstimateRequest req,
+                                            HttpServletRequest request) {
         AuthHelper.requireAuth(request);
 
         double estimate = fareCalculator.calculate(req.getDistanceKm());
-        Map body = new LinkedHashMap<>();
+        Map<String, Object> body = new LinkedHashMap<>();
         body.put("distanceKm", req.getDistanceKm());
         body.put("estimatedFare", estimate);
         body.put("currency", "Rs");
         return body;
     }
 
+    // Calculates and stores the final payment for a completed ride.
     @Operation(summary = "Record a simulated payment for a completed ride " +
             "(called by ride-service on ride completion)")
     @PostMapping("/payments")
-    public ResponseEntity createPayment(@Valid @RequestBody CreatePaymentRequest req,
+    public ResponseEntity<Payment> createPayment(@Valid @RequestBody CreatePaymentRequest req,
                                                  HttpServletRequest request) {
         AuthHelper.requireAuth(request);
 
@@ -91,6 +93,7 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(payment);
     }
 
+    // Returns one payment record, or a 404 response when the id is unknown.
     @Operation(summary = "Retrieve a payment / receipt by id")
     @GetMapping("/payments/{id}")
     public Payment getPayment(@PathVariable String id, HttpServletRequest request) {
@@ -99,10 +102,11 @@ public class PaymentController {
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Payment not found"));
     }
 
+    // Lists all payments, or only the payments belonging to the requested ride.
     @Operation(summary = "List payments, optionally filtered by rideId")
     @GetMapping("/payments")
-    public List listPayments(@RequestParam(required = false) String rideId,
-                                       HttpServletRequest request) {
+    public List<Payment> listPayments(@RequestParam(required = false) String rideId,
+                                      HttpServletRequest request) {
         AuthHelper.requireAuth(request);
         if (rideId != null) {
             return paymentRepository.findAllByRideId(rideId);
