@@ -47,6 +47,7 @@ public class RideController {
     }
 
     @Operation(summary = "Create a ride request (PASSENGER only)")
+    // Create a new ride request for PASSENGER role and set initial status to REQUESTED
     @PostMapping
     public Ride createRide(@Valid @RequestBody CreateRideRequest req, HttpServletRequest request) {
         AuthenticatedUser user = AuthHelper.requireAuth(request);
@@ -64,6 +65,7 @@ public class RideController {
     }
 
     @Operation(summary = "Assign an available driver to a REQUESTED ride (interservice call to driver-service)")
+    // Assign an available driver from driver-service to a REQUESTED ride
     @PostMapping("/{id}/assign")
     public Ride assignDriver(@PathVariable String id, HttpServletRequest request) {
         AuthenticatedUser user = AuthHelper.requireAuth(request);
@@ -96,6 +98,7 @@ public class RideController {
     }
 
     @Operation(summary = "Update ride status; COMPLETED triggers a call to payment-service")
+    // Update the ride lifecycle status and trigger payment-service when status is COMPLETED
     @PatchMapping("/{id}/status")
     public Ride updateStatus(@PathVariable String id, @Valid @RequestBody UpdateStatusRequest req,
                               HttpServletRequest request) {
@@ -134,6 +137,7 @@ public class RideController {
     }
 
     @Operation(summary = "Get a single ride (passenger, assigned driver, or ADMIN)")
+    // Retrieve details for a specific ride after checking authorization
     @GetMapping("/{id}")
     public Ride getRide(@PathVariable String id, HttpServletRequest request) {
         AuthenticatedUser user = AuthHelper.requireAuth(request);
@@ -150,6 +154,7 @@ public class RideController {
     }
 
     @Operation(summary = "List the current user's rides (as passenger or driver)")
+    // Fetch all rides associated with the current user (as a passenger or driver)
     @GetMapping
     public List<Ride> listRides(HttpServletRequest request) {
         AuthenticatedUser user = AuthHelper.requireAuth(request);
