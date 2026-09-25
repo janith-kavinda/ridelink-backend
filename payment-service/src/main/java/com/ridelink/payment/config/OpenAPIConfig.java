@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 @SecurityScheme(
     name = "bearerAuth",
     type = SecuritySchemeType.HTTP,
-    // Access tokens are expected in the Authorization: Bearer <token> header.
+    
     bearerFormat = "JWT",
     scheme = "bearer"
 )
