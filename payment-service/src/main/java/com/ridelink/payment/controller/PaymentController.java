@@ -1,5 +1,18 @@
 package com.ridelink.payment.controller;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.ridelink.payment.dto.CreatePaymentRequest;
 import com.ridelink.payment.dto.FareEstimateRequest;
 import com.ridelink.payment.exception.ApiException;
@@ -7,20 +20,19 @@ import com.ridelink.payment.model.Payment;
 import com.ridelink.payment.repository.PaymentRepository;
 import com.ridelink.payment.security.AuthHelper;
 import com.ridelink.payment.util.FareCalculator;
+
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
-@Tag(name = "Fares & Payments", description = "Fare estimation, final fare calculation, simulated payments and receipts")
+@Tag(
+    name = "Fares & Payments",
+    description = "Fare estimation, final fare calculation, simulated payments and receipts"
+)
+@SecurityRequirement(name = "bearerAuth")
 public class PaymentController {
 
     private final PaymentRepository paymentRepository;
@@ -33,12 +45,12 @@ public class PaymentController {
 
     @Operation(summary = "Estimate a fare for a given distance")
     @PostMapping("/fares/estimate")
-    public Map<String, Object> estimateFare(@Valid @RequestBody FareEstimateRequest req,
-                                             HttpServletRequest request) {
+    public Map estimateFare(@Valid @RequestBody FareEstimateRequest req,
+                                           HttpServletRequest request) {
         AuthHelper.requireAuth(request);
 
         double estimate = fareCalculator.calculate(req.getDistanceKm());
-        Map<String, Object> body = new LinkedHashMap<>();
+        Map body = new LinkedHashMap<>();
         body.put("distanceKm", req.getDistanceKm());
         body.put("estimatedFare", estimate);
         body.put("currency", "Rs");
@@ -48,8 +60,8 @@ public class PaymentController {
     @Operation(summary = "Record a simulated payment for a completed ride " +
             "(called by ride-service on ride completion)")
     @PostMapping("/payments")
-    public ResponseEntity<Payment> createPayment(@Valid @RequestBody CreatePaymentRequest req,
-                                                  HttpServletRequest request) {
+    public ResponseEntity createPayment(@Valid @RequestBody CreatePaymentRequest req,
+                                                 HttpServletRequest request) {
         AuthHelper.requireAuth(request);
 
         if (paymentRepository.findByRideId(req.getRideId()).isPresent()) {
@@ -89,7 +101,7 @@ public class PaymentController {
 
     @Operation(summary = "List payments, optionally filtered by rideId")
     @GetMapping("/payments")
-    public List<Payment> listPayments(@RequestParam(required = false) String rideId,
+    public List listPayments(@RequestParam(required = false) String rideId,
                                        HttpServletRequest request) {
         AuthHelper.requireAuth(request);
         if (rideId != null) {
