@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ridelink.payment.dto.CreatePaymentRequest;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import com.ridelink.payment.dto.FareEstimateRequest;
 import com.ridelink.payment.exception.ApiException;
 import com.ridelink.payment.model.Payment;
