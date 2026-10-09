@@ -12,6 +12,8 @@ public interface PaymentRepository extends MongoRepository<Payment, String> {
     // Returns the payment for a specific ride, if one already exists.
     Optional<Payment> findByRideId(String rideId);
 
+    Optional<Payment> findByReceiptNumber(String receiptNumber);
+
     // Returns all payment entries linked to a ride.
     List<Payment> findAllByRideId(String rideId);
 }

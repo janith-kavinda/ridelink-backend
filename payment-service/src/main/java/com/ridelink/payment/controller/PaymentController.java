@@ -79,6 +79,7 @@ public class PaymentController {
         payment.setPassengerId(req.getPassengerId());
         payment.setDistanceKm(req.getDistanceKm());
         payment.setFare(fare);
+        payment.setPaymentMethod(req.getPaymentMethod());
         payment.setReceiptNumber("RCPT-" + System.currentTimeMillis());
 
         // Simulated payment - fails only in the degenerate case of zero/negative distance,
@@ -101,6 +102,15 @@ public class PaymentController {
         AuthHelper.requireAuth(request);
         return paymentRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Payment not found"));
+    }
+
+    // Returns a payment receipt using the receipt number shown to the customer.
+    @Operation(summary = "Retrieve a payment receipt by receipt number")
+    @GetMapping("/payments/receipt/{receiptNumber}")
+    public Payment getReceipt(@PathVariable String receiptNumber, HttpServletRequest request) {
+        AuthHelper.requireAuth(request);
+        return paymentRepository.findByReceiptNumber(receiptNumber)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Receipt not found"));
     }
 
     // Lists all payments, or only the payments belonging to the requested ride.
