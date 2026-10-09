@@ -6,7 +6,7 @@ spring:
     name: ride-service
   data:
     mongodb:
-      uri: mongodb+srv://jkavinda680:KrD48DDtJlrWGyyH@cluster0.pk643sq.mongodb.net/account_db?retryWrites=true&w=majority&appName=Cluster0
+      uri: mongodb://localhost:27017/account_db
 
 jwt:
   secret: ridelink-shared-secret-change-me-to-a-long-random-string

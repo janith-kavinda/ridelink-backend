@@ -19,6 +19,7 @@ public class Payment {
     private double fare; // final computed fare for this ride
     private String currency = "Rs"; // currency used for this payment
 
+    private PaymentMethod paymentMethod = PaymentMethod.CASH;
     private String status; // PAID, FAILED
     private String receiptNumber; // unique external receipt identifier
 
@@ -39,6 +40,8 @@ public class Payment {
     public void setFare(double fare) { this.fare = fare; }
     public String getCurrency() { return currency; }
     public void setCurrency(String currency) { this.currency = currency; }
+    public PaymentMethod getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(PaymentMethod paymentMethod) { this.paymentMethod = paymentMethod; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public String getReceiptNumber() { return receiptNumber; }

@@ -4,6 +4,7 @@ import com.ridelink.payment.dto.CreatePaymentRequest;
 import com.ridelink.payment.dto.FareEstimateRequest;
 import com.ridelink.payment.exception.ApiException;
 import com.ridelink.payment.model.Payment;
+import com.ridelink.payment.model.PaymentMethod;
 import com.ridelink.payment.repository.PaymentRepository;
 import com.ridelink.payment.security.AuthenticatedUser;
 import com.ridelink.payment.util.FareCalculator;
@@ -64,12 +65,14 @@ class PaymentControllerTest {
         req.setRideId("ride-1");
         req.setPassengerId("passenger-1");
         req.setDistanceKm(5.0);
+        req.setPaymentMethod(PaymentMethod.CARD);
 
         var response = controller().createPayment(req, httpRequest);
 
         assertEquals(201, response.getStatusCode().value());
         assertEquals("PAID", response.getBody().getStatus());
         assertEquals(350.0, response.getBody().getFare()); // 100 + 5*50
+        assertEquals(PaymentMethod.CARD, response.getBody().getPaymentMethod());
     }
 
     @Test
